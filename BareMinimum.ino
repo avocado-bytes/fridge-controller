@@ -1,6 +1,6 @@
 #define SIGNAL_PIN 2
 #define READ_SIGNAL 114
-#define DATA_LENGTH 40
+#define DATA_LENGTH 41
 
 volatile int bits = 0;
 volatile long lengths[DATA_LENGTH];
@@ -10,22 +10,25 @@ void setup() {
   Serial.begin(9600);
   pinMode(SIGNAL_PIN, OUTPUT);
   digitalWrite(SIGNAL_PIN, HIGH);
+  delay(1000);
+  measureTemperature(SIGNAL_PIN, lengths);
+  extractDataBytesFromResponse(lengths, data);
 }
 
 void loop() {
-  if (Serial.available() > 0) {
-    byte incomingByte = Serial.read();
-    Serial.println(incomingByte);
-    if (incomingByte == READ_SIGNAL) {
-      measureTemperature(SIGNAL_PIN, lengths);
-      Serial.println(sizeof(lengths));
-      for (int i = 0; i < DATA_LENGTH; i ++) {
-        Serial.println(lengths[i]);
-      }
-    }
-  }
-  flushSerialBuffer();
-  delay(500);
+  // if (Serial.available() > 0) {
+  //   byte incomingByte = Serial.read();
+  //   if (incomingByte == READ_SIGNAL) {
+  //     measureTemperature(SIGNAL_PIN, lengths);
+  //     extractDataBytesFromResponse(lengths, data);
+  //     Serial.println("_____________");
+  //     for (int i = 0; i < 4; i ++) {
+  //       Serial.println(data[i], BIN);
+  //     }
+  //   }
+  // }
+  // flushSerialBuffer();
+  // delay(500);
 }
 
 void flushSerialBuffer() {
@@ -34,6 +37,20 @@ void flushSerialBuffer() {
       Serial.read();
     }
   }
+}
+
+void extractDataBytesFromResponse(long response[], byte result[]) {
+
+      for (int i = 0; i < 8; i ++) {
+        int bytePosition = 0;
+        byte byteInQuestion = result[bytePosition];
+        byteInQuestion = byteInQuestion << 1;
+        byte one = response[i] > 50 ? 1 : 0;
+        byteInQuestion = byteInQuestion | one;
+        Serial.println(byteInQuestion, BIN);
+        result[bytePosition] = byteInQuestion;
+      }
+
 }
 
 void measureTemperature(int interfacingPin, long result[]) {
