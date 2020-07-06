@@ -102,7 +102,7 @@ void printResults() {
  * will be interpreted as 1. 
  *  
  **/
-void extractDataBytesFromResponse(long response[], byte result[]) {
+void extractDataBytesFromResponse(volatile long response[], byte result[]) {
   int lastBytePosition = 0;
   for (int i = 0; i < DATA_LENGTH; i ++) {
     int bytePosition = i / 8;
@@ -126,7 +126,7 @@ void extractDataBytesFromResponse(long response[], byte result[]) {
  * the <b>lengths</b> array.
  * 
  **/
-void measureTemperature(int interfacingPin, long result[]) {
+void measureTemperature(int interfacingPin, volatile long result[]) {
   digitalWrite(interfacingPin, LOW);
   delayMicroseconds(18000);
   digitalWrite(interfacingPin, HIGH);
